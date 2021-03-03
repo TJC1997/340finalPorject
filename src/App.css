@@ -1,38 +1,153 @@
-.App {
-  text-align: center;
+.active {
+  background-color: cadetblue;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+body {
+  background-color: blueviolet;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
+h1 {
   color: white;
 }
 
-.App-link {
-  color: #61dafb;
+h2 {
+  color: aqua;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+h4 {
+  color: aqua;
+}
+h5 {
+  color: red;
+}
+
+.list-group {
+  display: flex;
+  flex-direction: row;
+}
+
+.list-column {
+  text-align: center;
+  margin: 10px;
+  display: flex;
+  flex-direction: column;
+}
+.list-group-item {
+  font-weight: bold;
+  color: gold;
+  margin: 10px;
+  background-color: blueviolet;
+  height: 60px;
+  width: auto;
+  padding: auto;
+  text-align: center;
+  border-style: none;
+  font-size: 20px;
+}
+.btn-primary {
+  background-color: blue;
+  height: 60px;
+  width: auto;
+  border-radius: 50%;
+  padding: 12px 20px;
+}
+.btn-danger {
+  background-color: red;
+  height: 60px;
+  width: auto;
+  border-radius: 50%;
+  padding: 12px 20px;
+}
+.main-page {
+  margin: 60px;
+}
+
+.update-modal {
+  background-color: black;
+}
+
+.update-form {
+  position: fixed;
+  top: 200px;
+  left: 500px;
+  right: 500px;
+  bottom: 500px;
+  background-color: azure;
+  z-index: 1000;
+  height: 300px;
+  width: 500px;
+  text-align: center;
+}
+
+.artist-update-form {
+  position: fixed;
+  top: 200px;
+  left: 500px;
+  right: 500px;
+  bottom: 500px;
+  background-color: azure;
+  z-index: 1000;
+  height: 550px;
+  width: 500px;
+  text-align: center;
+}
+
+.form-control {
+  margin: 50px;
+  width: 400px;
+  font-size: 20px;
+}
+
+.btn {
+  margin: 10px;
+}
+
+.btn-info {
+  font-size: large;
+  height: 40px;
+  width: auto;
+  padding: 0px 10px;
+  border-radius: 0%;
+  background-color: green;
+  margin-left: 50px;
+  color: white;
+}
+
+.navbar-brand {
+  background-color: red;
+  font-size: small;
+  font-weight: bold;
+  width: 100%;
+}
+
+.footer {
+  color: black;
+  background-color: dimgrey;
+}
+
+.footer a {
+  color: yellow;
+}
+
+.connect-update-form .form-label {
+  font-size: 20px;
+  color: blue;
+  margin: 10px;
+}
+
+.connect-update-form {
+  position: fixed;
+  top: 200px;
+  left: 500px;
+  right: 500px;
+  bottom: 500px;
+  background-color: azure;
+  z-index: 1000;
+  height: 650px;
+  width: 500px;
+  text-align: center;
+}
+
+.custom-select {
+  margin-bottom: 30px;
 }
