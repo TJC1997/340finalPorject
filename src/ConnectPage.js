@@ -7,60 +7,51 @@ import reactDom from "react-dom";
 
 import "./App.css";
 
+let track = 0;
+
 function UpdateForm(props) {
   const key = Object.keys(props.connections_data)[props.currentID].toString();
   const currentName = props.connections_data[key].songName;
   const currentAlbumName = props.connections_data[key].albumName;
   const currentsingerName = props.connections_data[key].singerName;
   const currentGenreName = props.connections_data[key].genreName;
+  const currentId = props.connections_data[key].songID;
 
-  const [albumSelection, setalbumSelection] = useState("");
-  const [artistSelection, setartistSelection] = useState("");
-  const [genreSelection, setgenreSelection] = useState("");
+  const [albumSelection, setalbumSelection] = useState("NULL");
+  const [artistSelection, setartistSelection] = useState("NULL");
+  const [genreSelection, setgenreSelection] = useState("NULL");
 
-  const [albumUpdate, setalbumUpdate] = useState("");
-  const [artistUpdate, setartistUpdate] = useState("");
-  const [genreUpdate, setgenreUpdate] = useState("");
+  const [albumUpdate, setalbumUpdate] = useState(currentAlbumName);
+  const [artistUpdate, setartistUpdate] = useState(currentsingerName);
+  const [genreUpdate, setgenreUpdate] = useState(currentGenreName);
 
   function selectOption(e, type) {
     e.preventDefault();
-    if (type === "album") {
+    if (type == 1) {
       setalbumSelection(e.target.value);
-      console.log(e.target.value);
-    } else if (type === "artist") {
+      // console.log(e.target.value);
+    } else if (type == 2) {
       setartistSelection(e.target.value);
-      console.log(e.target.value);
+      // console.log(e.target.value);
     } else {
       setgenreSelection(e.target.value);
-      console.log(e.target.value);
+      // console.log(e.target.value);
     }
   }
 
-  // useEffect(() => {
-  //   let copy = JSON.parse(JSON.stringify(props.connections_data));
-  //   if (albumUpdate != "") {
-  //     copy[key].albumName = albumUpdate;
-  //   }
-  //   if (artistUpdate != "") {
-  //     copy[key].singerName = artistUpdate;
-  //   }
-  //   if (genreUpdate != "") {
-  //     copy[key].genreName = genreUpdate;
-  //   }
-
-  //   props.setconnections_data(copy);
-  // }, [albumUpdate, artistUpdate, genreUpdate]);
-
   function updateNewConnection(e) {
     e.preventDefault();
-    if (albumSelection != "") {
+    if (albumSelection != "NULL") {
       setalbumUpdate(albumSelection);
+      console.log(albumSelection);
     }
-    if (artistSelection != "") {
+    if (artistSelection != "NULL") {
       setartistUpdate(artistSelection);
+      console.log(artistSelection);
     }
-    if (genreSelection != "") {
+    if (genreSelection != "NULL") {
       setgenreUpdate(genreSelection);
+      console.log(genreSelection);
     }
     props.setmodelIsOpen(false);
   }
@@ -137,6 +128,37 @@ function UpdateForm(props) {
     featchSearchResults();
   }, []);
 
+  useEffect(async () => {
+    async function updateData() {
+      console.log("updateing--", currentName);
+
+      try {
+        let link =
+          "http://flip2.engr.oregonstate.edu:2341/connections/update/" +
+          currentId +
+          "&" +
+          albumUpdate +
+          "&" +
+          currentName +
+          "&" +
+          genreUpdate +
+          "&" +
+          artistUpdate;
+        const res = await fetch(link);
+        console.log(link);
+        props.setupdate_data(++track);
+      } catch (e) {
+        if (e instanceof DOMException) {
+          console.log("HTTP request abort");
+        } else {
+          console.log("error");
+          console.log(e);
+        }
+      }
+    }
+    updateData();
+  }, [albumUpdate, genreUpdate, artistUpdate]);
+
   return reactDom.createPortal(
     <div>
       <Form className="connect-update-form">
@@ -152,7 +174,7 @@ function UpdateForm(props) {
             as="select"
             size="lg"
             custom
-            onChange={(e) => selectOption(e, "album")}
+            onChange={(e) => selectOption(e, 1)}
           >
             {Object.keys(db_albums_data).map((item, i) => (
               <option key={i}>{db_albums_data[item].albumName}</option>
@@ -165,7 +187,7 @@ function UpdateForm(props) {
             as="select"
             size="lg"
             custom
-            onChange={(e) => selectOption(e, "artist")}
+            onChange={(e) => selectOption(e, 2)}
           >
             {Object.keys(db_artists_data).map((item, i) => (
               <option key={i}>{db_artists_data[item].singerName}</option>
@@ -178,7 +200,7 @@ function UpdateForm(props) {
             as="select"
             size="lg"
             custom
-            onChange={(e) => selectOption(e, "genre")}
+            onChange={(e) => selectOption(e, 3)}
           >
             {Object.keys(db_genres_data).map((item, i) => (
               <option key={i}>{db_genres_data[item].genreName}</option>
@@ -230,6 +252,7 @@ function UpdateModal(props) {
           type={props.type}
           currentID={props.currentID}
           setmodelIsOpen={setmodelIsOpen}
+          setupdate_data={props.setupdate_data}
         />
       </Modal>
     </div>
@@ -239,16 +262,33 @@ function UpdateModal(props) {
 function DeleteForm(props) {
   const key = Object.keys(props.connections_data)[props.currentID].toString();
   const currentName = props.connections_data[key].songName;
+  const currentId = props.connections_data[key].songID;
   const [deleteElement, setdeleteElement] = useState(false);
 
-  // useEffect(() => {
-  //   if (deleteElement == true) {
-  //     console.log("deleting--", currentName);
-  //     let copy = JSON.parse(JSON.stringify(props.connections_data));
-  //     delete copy[key];
-  //     props.setconnections_data(copy);
-  //   }
-  // }, [deleteElement]);
+  useEffect(async () => {
+    async function deleteData() {
+      if (deleteElement == true) {
+        console.log("deleting--", currentName, currentId);
+        try {
+          let link =
+            "http://flip2.engr.oregonstate.edu:2341/connections/delete/" +
+            currentId;
+          const res = await fetch(link);
+          props.setupdate_data(++track);
+
+          console.log(link);
+        } catch (e) {
+          if (e instanceof DOMException) {
+            console.log("HTTP request abort");
+          } else {
+            console.log("error");
+            console.log(e);
+          }
+        }
+      }
+    }
+    deleteData();
+  }, [deleteElement]);
 
   function deleteName(e) {
     e.preventDefault();
@@ -304,6 +344,7 @@ function DeleteModal(props) {
           type={props.type}
           currentID={props.currentID}
           setmodelIsOpen={setmodelIsOpen}
+          setupdate_data={props.setupdate_data}
         />
       </Modal>
     </div>
@@ -312,30 +353,30 @@ function DeleteModal(props) {
 
 function AddForm(props) {
   const key = Object.keys(props.connections_data)[0].toString();
-  const currentName = props.connections_data[key].songName;
   const currentAlbumName = props.connections_data[key].albumName;
   const currentsingerName = props.connections_data[key].singerName;
   const currentGenreName = props.connections_data[key].genreName;
+  // const currentId = props.connections_data[key].songID;
 
-  const [songSelection, setsongSelection] = useState(currentName);
-  const [albumSelection, setalbumSelection] = useState(currentAlbumName);
-  const [artistSelection, setartistSelection] = useState(currentsingerName);
-  const [genreSelection, setgenreSelection] = useState(currentGenreName);
+  const [songSelection, setsongSelection] = useState("NULL");
+  const [albumSelection, setalbumSelection] = useState("NULL");
+  const [artistSelection, setartistSelection] = useState("NULL");
+  const [genreSelection, setgenreSelection] = useState("NULL");
 
-  const [songUpdate, setsongUpdate] = useState("");
-  const [albumUpdate, setalbumUpdate] = useState("");
-  const [artistUpdate, setartistUpdate] = useState("");
-  const [genreUpdate, setgenreUpdate] = useState("");
+  const [songUpdate, setsongUpdate] = useState("NULL");
+  const [albumUpdate, setalbumUpdate] = useState(currentAlbumName);
+  const [artistUpdate, setartistUpdate] = useState(currentsingerName);
+  const [genreUpdate, setgenreUpdate] = useState(currentGenreName);
 
   function selectOption(e, type) {
     e.preventDefault();
-    if (type === "song") {
+    if (type === 4) {
       setsongSelection(e.target.value);
       console.log(e.target.value);
-    } else if (type === "album") {
+    } else if (type === 1) {
       setalbumSelection(e.target.value);
       console.log(e.target.value);
-    } else if (type === "artist") {
+    } else if (type === 2) {
       setartistSelection(e.target.value);
       console.log(e.target.value);
     } else {
@@ -344,39 +385,18 @@ function AddForm(props) {
     }
   }
 
-  // useEffect(() => {
-  //   if (
-  //     songUpdate != "" &&
-  //     albumUpdate != "" &&
-  //     artistUpdate != "" &&
-  //     genreUpdate != ""
-  //   ) {
-  //     let copy = JSON.parse(JSON.stringify(props.connections_data));
-  //     const newkey =
-  //       songUpdate + "-" + albumUpdate + "-" + artistUpdate + "-" + genreUpdate;
-  //     copy[newkey] = {
-  //       songName: songUpdate,
-  //       albumName: albumUpdate,
-  //       singerName: artistUpdate,
-  //       genreName: genreUpdate,
-  //     };
-  //     props.setconnections_data(copy);
-  //     console.log("newkey ", newkey);
-  //   }
-  // }, [songUpdate, albumUpdate, artistUpdate, genreUpdate]);
-
   function addNewConnection(e) {
     e.preventDefault();
-    if (songSelection != "") {
+    if (songSelection != "NULL") {
       setsongUpdate(songSelection);
     }
-    if (albumSelection != "") {
+    if (albumSelection != "NULL") {
       setalbumUpdate(albumSelection);
     }
-    if (artistSelection != "") {
+    if (artistSelection != "NULL") {
       setartistUpdate(artistSelection);
     }
-    if (genreSelection != "") {
+    if (genreSelection != "NULL") {
       setgenreUpdate(genreSelection);
     }
     props.setmodelIsOpen(false);
@@ -478,6 +498,41 @@ function AddForm(props) {
     featchSearchResults();
   }, []);
 
+  useEffect(async () => {
+    async function updateData() {
+      console.log("updateing--", songUpdate);
+      if (
+        songUpdate != "NULL" &&
+        albumUpdate != "NULL" &&
+        artistUpdate != "NULL" &&
+        genreUpdate != "NULL"
+      ) {
+        try {
+          let link =
+            "http://flip2.engr.oregonstate.edu:2341/connections/insert/" +
+            albumUpdate +
+            "&" +
+            songUpdate +
+            "&" +
+            genreUpdate +
+            "&" +
+            artistUpdate;
+          const res = await fetch(link);
+          console.log("INSERT  ", link);
+          props.setupdate_data(++track);
+        } catch (e) {
+          if (e instanceof DOMException) {
+            console.log("HTTP request abort");
+          } else {
+            console.log("error");
+            console.log(e);
+          }
+        }
+      }
+    }
+    updateData();
+  }, [albumUpdate, genreUpdate, artistUpdate, songUpdate]);
+
   return reactDom.createPortal(
     <div>
       <Form className="connect-update-form">
@@ -489,11 +544,12 @@ function AddForm(props) {
             as="select"
             size="lg"
             custom
-            onChange={(e) => selectOption(e, "song")}
+            onChange={(e) => selectOption(e, 4)}
           >
             {Object.keys(db_songs_data).map((item, i) => (
               <option key={i}>{db_songs_data[item].songName}</option>
             ))}
+            <option>NULL</option>
           </Form.Control>
 
           <Form.Label>Please Select New Album Name</Form.Label>
@@ -501,7 +557,7 @@ function AddForm(props) {
             as="select"
             size="lg"
             custom
-            onChange={(e) => selectOption(e, "album")}
+            onChange={(e) => selectOption(e, 1)}
           >
             {Object.keys(db_albums_data).map((item, i) => (
               <option key={i}>{db_albums_data[item].albumName}</option>
@@ -514,7 +570,7 @@ function AddForm(props) {
             as="select"
             size="lg"
             custom
-            onChange={(e) => selectOption(e, "artist")}
+            onChange={(e) => selectOption(e, 2)}
           >
             {Object.keys(db_artists_data).map((item, i) => (
               <option key={i}>{db_artists_data[item].singerName}</option>
@@ -527,7 +583,7 @@ function AddForm(props) {
             as="select"
             size="lg"
             custom
-            onChange={(e) => selectOption(e, "genre")}
+            onChange={(e) => selectOption(e, 3)}
           >
             {Object.keys(db_genres_data).map((item, i) => (
               <option key={i}>{db_genres_data[item].genreName}</option>
@@ -578,6 +634,7 @@ function AddModal(props) {
           connections_data={props.connections_data}
           setconnections_data={props.setconnections_data}
           setmodelIsOpen={setmodelIsOpen}
+          setupdate_data={props.setupdate_data}
         />
       </Modal>
     </div>
@@ -586,12 +643,12 @@ function AddModal(props) {
 
 function ConnectPage(props) {
   const [connections_data, setconnections_data] = useState([]);
-
+  const [update_data, setupdate_data] = useState(0);
   useEffect(async () => {
     async function featchSearchResults() {
       let jsBody = {};
       try {
-        let link = "http://flip2.engr.oregonstate.edu:2341/songs";
+        let link = "http://flip2.engr.oregonstate.edu:2341/connections";
         const res = await fetch(link);
         jsBody = await res.json();
         console.log(link);
@@ -607,7 +664,7 @@ function ConnectPage(props) {
       setconnections_data(jsBody);
     }
     featchSearchResults();
-  }, []);
+  }, [update_data]);
 
   console.log(connections_data);
 
@@ -657,6 +714,7 @@ function ConnectPage(props) {
               key={i}
               connections_data={connections_data}
               setconnections_data={setconnections_data}
+              setupdate_data={setupdate_data}
             />
           ))}
         </div>
@@ -670,6 +728,7 @@ function ConnectPage(props) {
               key={i}
               connections_data={connections_data}
               setconnections_data={setconnections_data}
+              setupdate_data={setupdate_data}
             />
           ))}
         </div>
@@ -678,6 +737,7 @@ function ConnectPage(props) {
           type="Connection"
           connections_data={connections_data}
           setconnections_data={setconnections_data}
+          setupdate_data={setupdate_data}
         />
       </ul>
     </div>

@@ -7,32 +7,48 @@ import reactDom from "react-dom";
 
 import "./App.css";
 
+let track = 0;
+
 function UpdateForm(props) {
   const key = Object.keys(props.artists_data)[props.currentID].toString();
   const currentName = props.artists_data[key].singerName;
   const currentCity = props.artists_data[key].homeCity;
   const currentState = props.artists_data[key].homeState;
+  const currentId = props.artists_data[key].singerID;
 
   const [nameInput, setNameInput] = useState("");
   const [cityInput, setCityInput] = useState("");
   const [stateInput, setStateInput] = useState("");
-  const [newName, setNewName] = useState("");
-  const [newCity, setNewCity] = useState("");
-  const [newState, setNewState] = useState("");
+  const [newName, setNewName] = useState(currentName);
+  const [newCity, setNewCity] = useState(currentCity);
+  const [newState, setNewState] = useState(currentState);
 
-  // useEffect(() => {
-  //   let copy = JSON.parse(JSON.stringify(props.artists_data));
-  //   if (newName != "") {
-  //     copy[key].singerName = newName;
-  //   }
-  //   if (newCity != "") {
-  //     copy[key].homeCity = newCity;
-  //   }
-  //   if (newState != "") {
-  //     copy[key].homeState = newState;
-  //   }
-  //   props.setartists_data(copy);
-  // }, [newName, newCity, newState]);
+  useEffect(async () => {
+    async function updateData() {
+      try {
+        let link =
+          "http://flip2.engr.oregonstate.edu:2341/singers/update/" +
+          currentId +
+          "&" +
+          newName +
+          "&" +
+          newCity +
+          "&" +
+          newState;
+        const res = await fetch(link);
+        console.log(link);
+        props.setupdate_data(++track);
+      } catch (e) {
+        if (e instanceof DOMException) {
+          console.log("HTTP request abort");
+        } else {
+          console.log("error");
+          console.log(e);
+        }
+      }
+    }
+    updateData();
+  }, [newName, newCity, newState]);
 
   function updateNewName(e) {
     e.preventDefault();
@@ -122,6 +138,7 @@ function UpdateModal(props) {
           type={props.type}
           currentID={props.currentID}
           setmodelIsOpen={setmodelIsOpen}
+          setupdate_data={props.setupdate_data}
         />
       </Modal>
     </div>
@@ -131,16 +148,33 @@ function UpdateModal(props) {
 function DeleteForm(props) {
   const key = Object.keys(props.artists_data)[props.currentID].toString();
   const currentName = props.artists_data[key].singerName;
+  const currentId = props.artists_data[key].singerID;
   const [deleteElement, setdeleteElement] = useState(false);
 
-  // useEffect(() => {
-  //   if (deleteElement == true) {
-  //     console.log("deleting--", currentName);
-  //     let copy = JSON.parse(JSON.stringify(props.artists_data));
-  //     delete copy[key];
-  //     props.setartists_data(copy);
-  //   }
-  // }, [deleteElement]);
+  useEffect(async () => {
+    async function deleteData() {
+      if (deleteElement == true) {
+        console.log("deleting--", currentName, currentId);
+        try {
+          let link =
+            "http://flip2.engr.oregonstate.edu:2341/singers/delete/" +
+            currentId;
+          const res = await fetch(link);
+          props.setupdate_data(++track);
+
+          console.log(link);
+        } catch (e) {
+          if (e instanceof DOMException) {
+            console.log("HTTP request abort");
+          } else {
+            console.log("error");
+            console.log(e);
+          }
+        }
+      }
+    }
+    deleteData();
+  }, [deleteElement]);
 
   function deleteName(e) {
     e.preventDefault();
@@ -196,6 +230,7 @@ function DeleteModal(props) {
           type={props.type}
           currentID={props.currentID}
           setmodelIsOpen={setmodelIsOpen}
+          setupdate_data={props.setupdate_data}
         />
       </Modal>
     </div>
@@ -209,19 +244,34 @@ function AddForm(props) {
   const [newName, setNewName] = useState("");
   const [newCity, setNewCity] = useState("");
   const [newState, setNewState] = useState("");
-  // useEffect(() => {
-  //   if (newName != "" && newCity != "" && newState != "") {
-  //     let copy = JSON.parse(JSON.stringify(props.artists_data));
 
-  //     copy[newName] = {
-  //       singerName: newName,
-  //       homeCity: newCity,
-  //       homeState: newState,
-  //     };
-
-  //     props.setartists_data(copy);
-  //   }
-  // });
+  useEffect(async () => {
+    async function insertData() {
+      if (newName != "" && newCity != "" && newState != "") {
+        console.log("addding--", newName, newCity, newState);
+        try {
+          let link =
+            "http://flip2.engr.oregonstate.edu:2341/singers/insert/" +
+            newName +
+            "&" +
+            newCity +
+            "&" +
+            newState;
+          const res = await fetch(link);
+          console.log(link);
+          props.setupdate_data(++track);
+        } catch (e) {
+          if (e instanceof DOMException) {
+            console.log("HTTP request abort");
+          } else {
+            console.log("error");
+            console.log(e);
+          }
+        }
+      }
+    }
+    insertData();
+  }, [newName, newCity, newState]);
 
   function updateNewName(e) {
     e.preventDefault();
@@ -307,6 +357,7 @@ function AddModal(props) {
           artists_data={props.artists_data}
           setartists_data={props.setartists_data}
           setmodelIsOpen={setmodelIsOpen}
+          setupdate_data={props.setupdate_data}
         />
       </Modal>
     </div>
@@ -315,7 +366,7 @@ function AddModal(props) {
 
 function ArtistsPage(props) {
   const [artists_data, setartists_data] = useState([]);
-
+  const [update_data, setupdate_data] = useState(0);
   useEffect(async () => {
     async function featchSearchResults() {
       let jsBody = {};
@@ -336,7 +387,7 @@ function ArtistsPage(props) {
       setartists_data(jsBody);
     }
     featchSearchResults();
-  }, []);
+  }, [update_data]);
 
   return (
     <div className="main-page">
@@ -376,6 +427,7 @@ function ArtistsPage(props) {
               key={i}
               artists_data={artists_data}
               setartists_data={setartists_data}
+              setupdate_data={setupdate_data}
             />
           ))}
         </div>
@@ -389,6 +441,7 @@ function ArtistsPage(props) {
               key={i}
               artists_data={artists_data}
               setartists_data={setartists_data}
+              setupdate_data={setupdate_data}
             />
           ))}
         </div>
@@ -397,6 +450,7 @@ function ArtistsPage(props) {
           type="Artist"
           artists_data={artists_data}
           setartists_data={setartists_data}
+          setupdate_data={setupdate_data}
         />
       </ul>
     </div>

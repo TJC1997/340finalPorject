@@ -7,16 +7,19 @@ import reactDom from "react-dom";
 
 import "./App.css";
 
+let track = 0;
+
 function UpdateForm(props) {
   const key = Object.keys(props.albums_data)[props.currentID].toString();
   const currentName = props.albums_data[key].albumName;
   const currentCity = props.albums_data[key].albumReleaseDate;
+  const currentId = props.albums_data[key].albumID;
 
   const [nameInput, setNameInput] = useState("");
   const [cityInput, setCityInput] = useState("");
 
-  const [newName, setNewName] = useState("");
-  const [newCity, setNewCity] = useState("");
+  const [newName, setNewName] = useState(currentName);
+  const [newCity, setNewCity] = useState(currentCity);
 
   // useEffect(() => {
   //   let copy = JSON.parse(JSON.stringify(props.albums_data));
@@ -28,6 +31,31 @@ function UpdateForm(props) {
   //   }
   //   props.setalbums_data(copy);
   // }, [newName, newCity]);
+
+  useEffect(async () => {
+    async function updateData() {
+      try {
+        let link =
+          "http://flip2.engr.oregonstate.edu:2341/albums/update/" +
+          currentId +
+          "&" +
+          newName +
+          "&" +
+          newCity;
+        const res = await fetch(link);
+        console.log(link);
+        props.setupdate_data(++track);
+      } catch (e) {
+        if (e instanceof DOMException) {
+          console.log("HTTP request abort");
+        } else {
+          console.log("error");
+          console.log(e);
+        }
+      }
+    }
+    updateData();
+  }, [newName, newCity]);
 
   function updateNewName(e) {
     e.preventDefault();
@@ -106,6 +134,7 @@ function UpdateModal(props) {
           type={props.type}
           currentID={props.currentID}
           setmodelIsOpen={setmodelIsOpen}
+          setupdate_data={props.setupdate_data}
         />
       </Modal>
     </div>
@@ -116,15 +145,31 @@ function DeleteForm(props) {
   const key = Object.keys(props.albums_data)[props.currentID].toString();
   const currentName = props.albums_data[key].albumName;
   const [deleteElement, setdeleteElement] = useState(false);
+  const currentId = props.albums_data[key].albumID;
 
-  // useEffect(() => {
-  //   if (deleteElement == true) {
-  //     console.log("deleting--", currentName);
-  //     let copy = JSON.parse(JSON.stringify(props.albums_data));
-  //     delete copy[key];
-  //     props.setalbums_data(copy);
-  //   }
-  // }, [deleteElement]);
+  useEffect(async () => {
+    async function deleteData() {
+      if (deleteElement == true) {
+        console.log("deleting--", currentName, currentId);
+        try {
+          let link =
+            "http://flip2.engr.oregonstate.edu:2341/albums/delete/" + currentId;
+          const res = await fetch(link);
+          props.setupdate_data(++track);
+
+          console.log(link);
+        } catch (e) {
+          if (e instanceof DOMException) {
+            console.log("HTTP request abort");
+          } else {
+            console.log("error");
+            console.log(e);
+          }
+        }
+      }
+    }
+    deleteData();
+  }, [deleteElement]);
 
   function deleteName(e) {
     e.preventDefault();
@@ -180,6 +225,7 @@ function DeleteModal(props) {
           type={props.type}
           currentID={props.currentID}
           setmodelIsOpen={setmodelIsOpen}
+          setupdate_data={props.setupdate_data}
         />
       </Modal>
     </div>
@@ -203,6 +249,32 @@ function AddForm(props) {
   //     props.setalbums_data(copy);
   //   }
   // });
+
+  useEffect(async () => {
+    async function insertData() {
+      if (newName != "" && newCity != "") {
+        console.log("addding--", newName, newCity);
+        try {
+          let link =
+            "http://flip2.engr.oregonstate.edu:2341/albums/insert/" +
+            newName +
+            "&" +
+            newCity;
+          const res = await fetch(link);
+          console.log(link);
+          props.setupdate_data(++track);
+        } catch (e) {
+          if (e instanceof DOMException) {
+            console.log("HTTP request abort");
+          } else {
+            console.log("error");
+            console.log(e);
+          }
+        }
+      }
+    }
+    insertData();
+  }, [newName, newCity]);
 
   function updateNewName(e) {
     e.preventDefault();
@@ -278,6 +350,7 @@ function AddModal(props) {
           albums_data={props.albums_data}
           setalbums_data={props.setalbums_data}
           setmodelIsOpen={setmodelIsOpen}
+          setupdate_data={props.setupdate_data}
         />
       </Modal>
     </div>
@@ -286,7 +359,7 @@ function AddModal(props) {
 
 function AlbumsPage(props) {
   const [albums_data, setalbums_data] = useState([]);
-
+  const [update_data, setupdate_data] = useState(0);
   useEffect(async () => {
     async function featchSearchResults() {
       let jsBody = {};
@@ -307,7 +380,7 @@ function AlbumsPage(props) {
       setalbums_data(jsBody);
     }
     featchSearchResults();
-  }, []);
+  }, [update_data]);
 
   return (
     <div className="main-page">
@@ -339,6 +412,7 @@ function AlbumsPage(props) {
               key={i}
               albums_data={albums_data}
               setalbums_data={setalbums_data}
+              setupdate_data={setupdate_data}
             />
           ))}
         </div>
@@ -352,6 +426,7 @@ function AlbumsPage(props) {
               key={i}
               albums_data={albums_data}
               setalbums_data={setalbums_data}
+              setupdate_data={setupdate_data}
             />
           ))}
         </div>
@@ -360,6 +435,7 @@ function AlbumsPage(props) {
           type="Album"
           albums_data={albums_data}
           setalbums_data={setalbums_data}
+          setupdate_data={setupdate_data}
         />
       </ul>
     </div>

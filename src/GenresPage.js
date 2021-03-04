@@ -6,6 +6,8 @@ import Modal from "react-modal";
 import reactDom from "react-dom";
 import "./App.css";
 
+let track = 0;
+
 function findElement(data, id) {
   let i;
   for (i = 0; i < data.length; i++) {
@@ -13,7 +15,6 @@ function findElement(data, id) {
     if (data[i].genreID === id) {
       break;
     }
-    ++i;
   }
   return i;
 }
@@ -21,18 +22,36 @@ function findElement(data, id) {
 function UpdateForm(props) {
   const key = findElement(props.genres_data, props.currentID);
   const currentName = props.genres_data[key].genreName;
+  const currentId = props.genres_data[key].genreID;
   console.log("key---", key);
   const [input, setInput] = useState("");
   const [newName, setNewName] = useState("");
 
-  // useEffect(() => {
-  //   if (newName != "") {
-  //     console.log("updateing--", newName);
-  //     let copy = JSON.parse(JSON.stringify(props.genres_data));
-  //     copy[key].genreName = newName;
-  //     props.setgenres_data(copy);
-  //   }
-  // }, [newName]);
+  useEffect(async () => {
+    async function updateData() {
+      if (newName != "") {
+        console.log("updateing--", newName);
+        try {
+          let link =
+            "http://flip2.engr.oregonstate.edu:2341/genres/update/" +
+            currentId +
+            "&" +
+            newName;
+          const res = await fetch(link);
+          console.log(link);
+          props.setupdate_data(++track);
+        } catch (e) {
+          if (e instanceof DOMException) {
+            console.log("HTTP request abort");
+          } else {
+            console.log("error");
+            console.log(e);
+          }
+        }
+      }
+    }
+    updateData();
+  }, [newName]);
 
   function updateNewName(e) {
     e.preventDefault();
@@ -101,6 +120,8 @@ function UpdateModal(props) {
           type={props.type}
           currentID={props.currentID}
           setmodelIsOpen={setmodelIsOpen}
+          update_data={props.update_data}
+          setupdate_data={props.setupdate_data}
         />
       </Modal>
     </div>
@@ -109,17 +130,34 @@ function UpdateModal(props) {
 
 function DeleteForm(props) {
   const key = findElement(props.genres_data, props.currentID);
+  console.log("KEY", key);
   const currentName = props.genres_data[key].genreName;
+  const currentId = props.genres_data[key].genreID;
   const [deleteElement, setdeleteElement] = useState(false);
 
-  // useEffect(() => {
-  //   if (deleteElement == true) {
-  //     console.log("deleting--", currentName);
-  //     let copy = JSON.parse(JSON.stringify(props.genres_data));
-  //     copy.pop(key);
-  //     props.setgenres_data(copy);
-  //   }
-  // }, [deleteElement]);
+  useEffect(async () => {
+    async function deleteData() {
+      if (deleteElement == true) {
+        console.log("deleting--", currentName, currentId);
+        try {
+          let link =
+            "http://flip2.engr.oregonstate.edu:2341/genres/delete/" + currentId;
+          const res = await fetch(link);
+          props.setupdate_data(++track);
+
+          console.log(link);
+        } catch (e) {
+          if (e instanceof DOMException) {
+            console.log("HTTP request abort");
+          } else {
+            console.log("error");
+            console.log(e);
+          }
+        }
+      }
+    }
+    deleteData();
+  }, [deleteElement]);
 
   function deleteName(e) {
     e.preventDefault();
@@ -133,6 +171,7 @@ function DeleteForm(props) {
         <Form.Group>
           <h4>Delete {props.type} Name</h4>
           <h5>The current Genre Name is {currentName}</h5>
+          <h5>The current Genre ID is {currentId}</h5>
           <h5>Are you sure to delete it?</h5>
         </Form.Group>
 
@@ -175,6 +214,7 @@ function DeleteModal(props) {
           type={props.type}
           currentID={props.currentID}
           setmodelIsOpen={setmodelIsOpen}
+          setupdate_data={props.setupdate_data}
         />
       </Modal>
     </div>
@@ -184,16 +224,28 @@ function DeleteModal(props) {
 function AddForm(props) {
   const [input, setInput] = useState("");
   const [newName, setNewName] = useState("");
-  // useEffect(() => {
-  //   if (newName != "") {
-  //     console.log("addding--", newName);
-  //     // console.log("old", props.genres_data);
-  //     let copy = JSON.parse(JSON.stringify(props.genres_data));
-  //     copy[newName] = { genreName: newName };
-  //     props.setgenres_data(copy);
-  //     console.log("new", copy);
-  //   }
-  // }, [newName]);
+  useEffect(async () => {
+    async function insertData() {
+      if (newName != "") {
+        console.log("addding--", newName);
+        try {
+          let link =
+            "http://flip2.engr.oregonstate.edu:2341/genres/insert/" + newName;
+          const res = await fetch(link);
+          console.log(link);
+          props.setupdate_data(++track);
+        } catch (e) {
+          if (e instanceof DOMException) {
+            console.log("HTTP request abort");
+          } else {
+            console.log("error");
+            console.log(e);
+          }
+        }
+      }
+    }
+    insertData();
+  }, [newName]);
 
   function updateNewName(e) {
     e.preventDefault();
@@ -260,6 +312,7 @@ function AddModal(props) {
           genres_data={props.genres_data}
           setgenres_data={props.setgenres_data}
           setmodelIsOpen={setmodelIsOpen}
+          setupdate_data={props.setupdate_data}
         />
       </Modal>
     </div>
@@ -268,7 +321,7 @@ function AddModal(props) {
 
 function GenresPage(props) {
   const [genres_data, setgenres_data] = useState([]);
-
+  const [update_data, setupdate_data] = useState(0);
   useEffect(async () => {
     async function featchSearchResults() {
       let jsBody = {};
@@ -289,11 +342,8 @@ function GenresPage(props) {
       setgenres_data(jsBody);
     }
     featchSearchResults();
-  }, []);
+  }, [update_data]);
 
-  console.log(genres_data);
-
-  console.log(genres_data);
   return (
     <div className="main-page">
       <h1>Music Genres Page</h1>
@@ -316,6 +366,7 @@ function GenresPage(props) {
               key={i}
               genres_data={genres_data}
               setgenres_data={setgenres_data}
+              setupdate_data={setupdate_data}
             />
           ))}
         </div>
@@ -329,6 +380,7 @@ function GenresPage(props) {
               key={i}
               genres_data={genres_data}
               setgenres_data={setgenres_data}
+              setupdate_data={setupdate_data}
             />
           ))}
         </div>
@@ -337,6 +389,7 @@ function GenresPage(props) {
           type="Genre"
           genres_data={genres_data}
           setgenres_data={setgenres_data}
+          setupdate_data={setupdate_data}
         />
       </ul>
     </div>

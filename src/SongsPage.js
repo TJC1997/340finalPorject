@@ -7,35 +7,48 @@ import reactDom from "react-dom";
 
 import "./App.css";
 
+let track = 0;
+
 function UpdateForm(props) {
   const key = Object.keys(props.songs_data)[props.currentID].toString();
   const currentName = props.songs_data[key].songName;
-  const currentCity = props.songs_data[key].artist_name;
+  const currentId = props.songs_data[key].songID;
 
   const [nameInput, setNameInput] = useState("");
-  const [cityInput, setCityInput] = useState("");
 
   const [newName, setNewName] = useState("");
-  const [newCity, setNewCity] = useState("");
 
-  // useEffect(() => {
-  //   let copy = JSON.parse(JSON.stringify(props.songs_data));
-  //   if (newName != "") {
-  //     copy[key].songName = newName;
-  //   }
-
-  //   props.setsongs_data(copy);
-  // }, [newName, newCity]);
+  useEffect(async () => {
+    async function updateData() {
+      if (newName != "") {
+        console.log("updateing--", newName);
+        try {
+          let link =
+            "http://flip2.engr.oregonstate.edu:2341/songs/update/" +
+            currentId +
+            "&" +
+            newName;
+          const res = await fetch(link);
+          console.log(link);
+          props.setupdate_data(++track);
+        } catch (e) {
+          if (e instanceof DOMException) {
+            console.log("HTTP request abort");
+          } else {
+            console.log("error");
+            console.log(e);
+          }
+        }
+      }
+    }
+    updateData();
+  }, [newName]);
 
   function updateNewName(e) {
     e.preventDefault();
     if (nameInput != "") {
       console.log(nameInput);
       setNewName(nameInput);
-    }
-    if (cityInput != "") {
-      console.log(cityInput);
-      setNewCity(cityInput);
     }
     props.setmodelIsOpen(false);
   }
@@ -97,6 +110,7 @@ function UpdateModal(props) {
           type={props.type}
           currentID={props.currentID}
           setmodelIsOpen={setmodelIsOpen}
+          setupdate_data={props.setupdate_data}
         />
       </Modal>
     </div>
@@ -106,16 +120,32 @@ function UpdateModal(props) {
 function DeleteForm(props) {
   const key = Object.keys(props.songs_data)[props.currentID].toString();
   const currentName = props.songs_data[key].songName;
+  const currentId = props.songs_data[key].songID;
   const [deleteElement, setdeleteElement] = useState(false);
 
-  // useEffect(() => {
-  //   if (deleteElement == true) {
-  //     console.log("deleting--", currentName);
-  //     let copy = JSON.parse(JSON.stringify(props.songs_data));
-  //     delete copy[key];
-  //     props.setsongs_data(copy);
-  //   }
-  // }, [deleteElement]);
+  useEffect(async () => {
+    async function deleteData() {
+      if (deleteElement == true) {
+        console.log("deleting--", currentName, currentId);
+        try {
+          let link =
+            "http://flip2.engr.oregonstate.edu:2341/songs/delete/" + currentId;
+          const res = await fetch(link);
+          props.setupdate_data(++track);
+
+          console.log(link);
+        } catch (e) {
+          if (e instanceof DOMException) {
+            console.log("HTTP request abort");
+          } else {
+            console.log("error");
+            console.log(e);
+          }
+        }
+      }
+    }
+    deleteData();
+  }, [deleteElement]);
 
   function deleteName(e) {
     e.preventDefault();
@@ -171,6 +201,7 @@ function DeleteModal(props) {
           type={props.type}
           currentID={props.currentID}
           setmodelIsOpen={setmodelIsOpen}
+          setupdate_data={props.setupdate_data}
         />
       </Modal>
     </div>
@@ -182,19 +213,28 @@ function AddForm(props) {
 
   const [newName, setNewName] = useState("");
 
-  // useEffect(() => {
-  //   if (newName != "") {
-  //     let copy = JSON.parse(JSON.stringify(props.songs_data));
-
-  //     copy[newName] = {
-  //       songName: newName,
-  //       artist_name: "NULL",
-  //       album_name: "NULL",
-  //       genre_name: "NULL",
-  //     };
-  //     props.setsongs_data(copy);
-  //   }
-  // });
+  useEffect(async () => {
+    async function insertData() {
+      if (newName != "") {
+        console.log("addding--", newName);
+        try {
+          let link =
+            "http://flip2.engr.oregonstate.edu:2341/songs/insert/" + newName;
+          const res = await fetch(link);
+          console.log(link);
+          props.setupdate_data(++track);
+        } catch (e) {
+          if (e instanceof DOMException) {
+            console.log("HTTP request abort");
+          } else {
+            console.log("error");
+            console.log(e);
+          }
+        }
+      }
+    }
+    insertData();
+  }, [newName]);
 
   function updateNewName(e) {
     e.preventDefault();
@@ -260,6 +300,7 @@ function AddModal(props) {
           songs_data={props.songs_data}
           setsongs_data={props.setsongs_data}
           setmodelIsOpen={setmodelIsOpen}
+          setupdate_data={props.setupdate_data}
         />
       </Modal>
     </div>
@@ -268,6 +309,7 @@ function AddModal(props) {
 
 function SongsPage(props) {
   const [songs_data, setsongs_data] = useState([]);
+  const [update_data, setupdate_data] = useState(0);
 
   useEffect(async () => {
     async function featchSearchResults() {
@@ -289,7 +331,7 @@ function SongsPage(props) {
       setsongs_data(jsBody);
     }
     featchSearchResults();
-  }, []);
+  }, [update_data]);
 
   return (
     <div className="main-page">
@@ -313,6 +355,7 @@ function SongsPage(props) {
               key={i}
               songs_data={songs_data}
               setsongs_data={setsongs_data}
+              setupdate_data={setupdate_data}
             />
           ))}
         </div>
@@ -326,6 +369,7 @@ function SongsPage(props) {
               key={i}
               songs_data={songs_data}
               setsongs_data={setsongs_data}
+              setupdate_data={setupdate_data}
             />
           ))}
         </div>
@@ -334,6 +378,7 @@ function SongsPage(props) {
           type="Song"
           songs_data={songs_data}
           setsongs_data={setsongs_data}
+          setupdate_data={setupdate_data}
         />
       </ul>
     </div>
