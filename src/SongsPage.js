@@ -228,7 +228,7 @@ function UpdateModal(props) {
 }
 
 function DeleteForm(props) {
-  const key = Object.keys(props.songs_data)[props.currentID].toString();
+  const key = findElement(props.songs_data, props.currentID);
   const currentName = props.songs_data[key].songName;
   const currentId = props.songs_data[key].songID;
   console.log(currentId);
@@ -449,6 +449,7 @@ function AddForm(props) {
             custom
             onChange={(e) => selectOption(e, 1)}
           >
+            <option>{""}</option>
             {Object.keys(db_albums_data).map((item, i) => (
               <option key={i}>{db_albums_data[item].albumName}</option>
             ))}
@@ -461,6 +462,7 @@ function AddForm(props) {
             custom
             onChange={(e) => selectOption(e, 3)}
           >
+            <option>{""}</option>
             {Object.keys(db_genres_data).map((item, i) => (
               <option key={i}>{db_genres_data[item].genreName}</option>
             ))}
