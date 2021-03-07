@@ -395,55 +395,70 @@ function ArtistsPage(props) {
       <ul className="list-group">
         <div className="list-column">
           <h4>Artist Name</h4>
-          {Object.keys(artists_data).map((item, i) => (
-            <li className="list-group-item" key={i}>
-              {artists_data[item].singerName}
-            </li>
-          ))}
+          {Object.keys(artists_data).map(
+            (item, i) =>
+              artists_data[item].singerName != "NULL" && (
+                <li className="list-group-item" key={i}>
+                  {artists_data[item].singerName}
+                </li>
+              )
+          )}
         </div>
         <div className="list-column">
           <h4>Home City</h4>
-          {Object.keys(artists_data).map((item, i) => (
-            <li className="list-group-item" key={i}>
-              {artists_data[item].homeCity}
-            </li>
-          ))}
+          {Object.keys(artists_data).map(
+            (item, i) =>
+              artists_data[item].singerName != "NULL" && (
+                <li className="list-group-item" key={i}>
+                  {artists_data[item].homeCity}
+                </li>
+              )
+          )}
         </div>
         <div className="list-column">
           <h4>Home State</h4>
-          {Object.keys(artists_data).map((item, i) => (
-            <li className="list-group-item" key={i}>
-              {artists_data[item].homeState}
-            </li>
-          ))}
+          {Object.keys(artists_data).map(
+            (item, i) =>
+              artists_data[item].singerName != "NULL" && (
+                <li className="list-group-item" key={i}>
+                  {artists_data[item].homeState}
+                </li>
+              )
+          )}
         </div>
 
         <div className="list-column">
           <h4>Update Artist</h4>
-          {Object.keys(artists_data).map((item, i) => (
-            <UpdateModal
-              type="Artist"
-              currentID={i}
-              key={i}
-              artists_data={artists_data}
-              setartists_data={setartists_data}
-              setupdate_data={setupdate_data}
-            />
-          ))}
+          {Object.keys(artists_data).map(
+            (item, i) =>
+              artists_data[item].singerName != "NULL" && (
+                <UpdateModal
+                  type="Artist"
+                  currentID={i}
+                  key={i}
+                  artists_data={artists_data}
+                  setartists_data={setartists_data}
+                  setupdate_data={setupdate_data}
+                />
+              )
+          )}
         </div>
 
         <div className="list-column">
           <h4>Delete Artist</h4>
-          {Object.keys(artists_data).map((item, i) => (
-            <DeleteModal
-              type="Artist"
-              currentID={i}
-              key={i}
-              artists_data={artists_data}
-              setartists_data={setartists_data}
-              setupdate_data={setupdate_data}
-            />
-          ))}
+          {Object.keys(artists_data).map(
+            (item, i) =>
+              artists_data[item].singerName != "NULL" && (
+                <DeleteModal
+                  type="Artist"
+                  currentID={i}
+                  key={i}
+                  artists_data={artists_data}
+                  setartists_data={setartists_data}
+                  setupdate_data={setupdate_data}
+                />
+              )
+          )}
         </div>
 
         <AddModal

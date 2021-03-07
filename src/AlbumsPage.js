@@ -84,7 +84,7 @@ function UpdateForm(props) {
             }}
           />
           <Form.Control
-            placeholder="Enter New Release Date"
+            placeholder="Enter New Release Date (YEAR-MM-DD)"
             onChange={(e) => {
               setCityInput(e.target.value);
             }}
@@ -301,7 +301,7 @@ function AddForm(props) {
             }}
           />
           <Form.Control
-            placeholder="Add New Release Date"
+            placeholder="Add New Release Date (YEAR-MM-DD)"
             onChange={(e) => {
               setCityInput(e.target.value);
             }}
@@ -388,47 +388,59 @@ function AlbumsPage(props) {
       <ul className="list-group">
         <div className="list-column">
           <h4>Album Name</h4>
-          {Object.keys(albums_data).map((item, i) => (
-            <li className="list-group-item" key={i}>
-              {albums_data[item].albumName}
-            </li>
-          ))}
+          {Object.keys(albums_data).map(
+            (item, i) =>
+              albums_data[item].albumName != "NULL" && (
+                <li className="list-group-item" key={i}>
+                  {albums_data[item].albumName}
+                </li>
+              )
+          )}
         </div>
         <div className="list-column">
           <h4>Release Date</h4>
-          {Object.keys(albums_data).map((item, i) => (
-            <li className="list-group-item" key={i}>
-              {albums_data[item].albumReleaseDate}
-            </li>
-          ))}
+          {Object.keys(albums_data).map(
+            (item, i) =>
+              albums_data[item].albumName != "NULL" && (
+                <li className="list-group-item" key={i}>
+                  {albums_data[item].albumReleaseDate.slice(0, 10)}
+                </li>
+              )
+          )}
         </div>
 
         <div className="list-column">
           <h4>Update Album</h4>
-          {Object.keys(albums_data).map((item, i) => (
-            <UpdateModal
-              type="Album"
-              currentID={i}
-              key={i}
-              albums_data={albums_data}
-              setalbums_data={setalbums_data}
-              setupdate_data={setupdate_data}
-            />
-          ))}
+          {Object.keys(albums_data).map(
+            (item, i) =>
+              albums_data[item].albumName != "NULL" && (
+                <UpdateModal
+                  type="Album"
+                  currentID={i}
+                  key={i}
+                  albums_data={albums_data}
+                  setalbums_data={setalbums_data}
+                  setupdate_data={setupdate_data}
+                />
+              )
+          )}
         </div>
 
         <div className="list-column">
           <h4>Delete Album</h4>
-          {Object.keys(albums_data).map((item, i) => (
-            <DeleteModal
-              type="Album"
-              currentID={i}
-              key={i}
-              albums_data={albums_data}
-              setalbums_data={setalbums_data}
-              setupdate_data={setupdate_data}
-            />
-          ))}
+          {Object.keys(albums_data).map(
+            (item, i) =>
+              albums_data[item].albumName != "NULL" && (
+                <DeleteModal
+                  type="Album"
+                  currentID={i}
+                  key={i}
+                  albums_data={albums_data}
+                  setalbums_data={setalbums_data}
+                  setupdate_data={setupdate_data}
+                />
+              )
+          )}
         </div>
 
         <AddModal

@@ -151,3 +151,11 @@ h5 {
 .custom-select {
   margin-bottom: 30px;
 }
+
+.search-box {
+  display: flex;
+  flex-direction: row;
+}
+.search-button {
+  margin-top: 40px;
+}

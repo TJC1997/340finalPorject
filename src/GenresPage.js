@@ -350,39 +350,48 @@ function GenresPage(props) {
       <ul className="list-group">
         <div className="list-column">
           <h4>Genre Name</h4>
-          {Object.keys(genres_data).map((item, i) => (
-            <li className="list-group-item" key={i}>
-              {genres_data[item].genreName}
-            </li>
-          ))}
+          {Object.keys(genres_data).map(
+            (item, i) =>
+              genres_data[item].genreName != "NULL" && (
+                <li className="list-group-item" key={i}>
+                  {genres_data[item].genreName}
+                </li>
+              )
+          )}
         </div>
 
         <div className="list-column">
           <h4>Update Name</h4>
-          {Object.keys(genres_data).map((item, i) => (
-            <UpdateModal
-              type="Genre"
-              currentID={genres_data[i].genreID}
-              key={i}
-              genres_data={genres_data}
-              setgenres_data={setgenres_data}
-              setupdate_data={setupdate_data}
-            />
-          ))}
+          {Object.keys(genres_data).map(
+            (item, i) =>
+              genres_data[item].genreName != "NULL" && (
+                <UpdateModal
+                  type="Genre"
+                  currentID={genres_data[i].genreID}
+                  key={i}
+                  genres_data={genres_data}
+                  setgenres_data={setgenres_data}
+                  setupdate_data={setupdate_data}
+                />
+              )
+          )}
         </div>
 
         <div className="list-column">
           <h4>Delete Name</h4>
-          {Object.keys(genres_data).map((item, i) => (
-            <DeleteModal
-              type="Genre"
-              currentID={genres_data[i].genreID}
-              key={i}
-              genres_data={genres_data}
-              setgenres_data={setgenres_data}
-              setupdate_data={setupdate_data}
-            />
-          ))}
+          {Object.keys(genres_data).map(
+            (item, i) =>
+              genres_data[item].genreName != "NULL" && (
+                <DeleteModal
+                  type="Genre"
+                  currentID={genres_data[i].genreID}
+                  key={i}
+                  genres_data={genres_data}
+                  setgenres_data={setgenres_data}
+                  setupdate_data={setupdate_data}
+                />
+              )
+          )}
         </div>
 
         <AddModal

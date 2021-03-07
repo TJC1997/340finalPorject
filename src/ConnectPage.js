@@ -179,7 +179,6 @@ function UpdateForm(props) {
             {Object.keys(db_albums_data).map((item, i) => (
               <option key={i}>{db_albums_data[item].albumName}</option>
             ))}
-            <option>NULL</option>
           </Form.Control>
 
           <Form.Label>Please Select New Artist Name</Form.Label>
@@ -192,7 +191,6 @@ function UpdateForm(props) {
             {Object.keys(db_artists_data).map((item, i) => (
               <option key={i}>{db_artists_data[item].singerName}</option>
             ))}
-            <option>NULL</option>
           </Form.Control>
 
           <Form.Label>Please Select New Genres Name</Form.Label>
@@ -205,7 +203,6 @@ function UpdateForm(props) {
             {Object.keys(db_genres_data).map((item, i) => (
               <option key={i}>{db_genres_data[item].genreName}</option>
             ))}
-            <option>NULL</option>
           </Form.Control>
         </Form.Group>
 
@@ -352,21 +349,15 @@ function DeleteModal(props) {
 }
 
 function AddForm(props) {
-  const key = Object.keys(props.connections_data)[0].toString();
-  const currentAlbumName = props.connections_data[key].albumName;
-  const currentsingerName = props.connections_data[key].singerName;
-  const currentGenreName = props.connections_data[key].genreName;
-  // const currentId = props.connections_data[key].songID;
-
   const [songSelection, setsongSelection] = useState("NULL");
   const [albumSelection, setalbumSelection] = useState("NULL");
   const [artistSelection, setartistSelection] = useState("NULL");
   const [genreSelection, setgenreSelection] = useState("NULL");
 
   const [songUpdate, setsongUpdate] = useState("NULL");
-  const [albumUpdate, setalbumUpdate] = useState(currentAlbumName);
-  const [artistUpdate, setartistUpdate] = useState(currentsingerName);
-  const [genreUpdate, setgenreUpdate] = useState(currentGenreName);
+  const [albumUpdate, setalbumUpdate] = useState("NULL");
+  const [artistUpdate, setartistUpdate] = useState("NULL");
+  const [genreUpdate, setgenreUpdate] = useState("NULL");
 
   function selectOption(e, type) {
     e.preventDefault();
@@ -500,11 +491,11 @@ function AddForm(props) {
 
   useEffect(async () => {
     async function updateData() {
-      console.log("updateing--", songUpdate);
+      console.log("adding--", songUpdate);
       if (
-        songUpdate != "NULL" &&
-        albumUpdate != "NULL" &&
-        artistUpdate != "NULL" &&
+        songUpdate != "NULL" ||
+        albumUpdate != "NULL" ||
+        artistUpdate != "NULL" ||
         genreUpdate != "NULL"
       ) {
         try {
@@ -546,10 +537,13 @@ function AddForm(props) {
             custom
             onChange={(e) => selectOption(e, 4)}
           >
-            {Object.keys(db_songs_data).map((item, i) => (
-              <option key={i}>{db_songs_data[item].songName}</option>
-            ))}
-            <option>NULL</option>
+            <option>{""}</option>
+            {Object.keys(db_songs_data).map(
+              (item, i) =>
+                db_songs_data[item].songName != "NULL" && (
+                  <option key={i}>{db_songs_data[item].songName}</option>
+                )
+            )}
           </Form.Control>
 
           <Form.Label>Please Select New Album Name</Form.Label>
@@ -559,10 +553,10 @@ function AddForm(props) {
             custom
             onChange={(e) => selectOption(e, 1)}
           >
+            <option>{""}</option>
             {Object.keys(db_albums_data).map((item, i) => (
               <option key={i}>{db_albums_data[item].albumName}</option>
             ))}
-            <option>NULL</option>
           </Form.Control>
 
           <Form.Label>Please Select New Artist Name</Form.Label>
@@ -572,10 +566,10 @@ function AddForm(props) {
             custom
             onChange={(e) => selectOption(e, 2)}
           >
+            <option>{""}</option>
             {Object.keys(db_artists_data).map((item, i) => (
               <option key={i}>{db_artists_data[item].singerName}</option>
             ))}
-            <option>NULL</option>
           </Form.Control>
 
           <Form.Label>Please Select New Genres Name</Form.Label>
@@ -585,10 +579,10 @@ function AddForm(props) {
             custom
             onChange={(e) => selectOption(e, 3)}
           >
+            <option>{""}</option>
             {Object.keys(db_genres_data).map((item, i) => (
               <option key={i}>{db_genres_data[item].genreName}</option>
             ))}
-            <option>NULL</option>
           </Form.Control>
         </Form.Group>
 
@@ -674,63 +668,81 @@ function ConnectPage(props) {
       <ul className="list-group">
         <div className="list-column">
           <h4>Song Name</h4>
-          {Object.keys(connections_data).map((item, i) => (
-            <li className="list-group-item" key={i}>
-              {connections_data[item].songName}
-            </li>
-          ))}
+          {Object.keys(connections_data).map(
+            (item, i) =>
+              connections_data[item].songName != "NULL" && (
+                <li className="list-group-item" key={i}>
+                  {connections_data[item].songName}
+                </li>
+              )
+          )}
         </div>
         <div className="list-column">
           <h4>Album Name</h4>
-          {Object.keys(connections_data).map((item, i) => (
-            <li className="list-group-item" key={i}>
-              {connections_data[item].albumName}
-            </li>
-          ))}
+          {Object.keys(connections_data).map(
+            (item, i) =>
+              connections_data[item].songName != "NULL" && (
+                <li className="list-group-item" key={i}>
+                  {connections_data[item].albumName}
+                </li>
+              )
+          )}
         </div>
         <div className="list-column">
           <h4>Artist Name</h4>
-          {Object.keys(connections_data).map((item, i) => (
-            <li className="list-group-item" key={i}>
-              {connections_data[item].singerName}
-            </li>
-          ))}
+          {Object.keys(connections_data).map(
+            (item, i) =>
+              connections_data[item].songName != "NULL" && (
+                <li className="list-group-item" key={i}>
+                  {connections_data[item].singerName}
+                </li>
+              )
+          )}
         </div>
         <div className="list-column">
           <h4>Genre Name</h4>
-          {Object.keys(connections_data).map((item, i) => (
-            <li className="list-group-item" key={i}>
-              {connections_data[item].genreName}
-            </li>
-          ))}
+          {Object.keys(connections_data).map(
+            (item, i) =>
+              connections_data[item].songName != "NULL" && (
+                <li className="list-group-item" key={i}>
+                  {connections_data[item].genreName}
+                </li>
+              )
+          )}
         </div>
 
         <div className="list-column">
           <h4>Update Connection</h4>
-          {Object.keys(connections_data).map((item, i) => (
-            <UpdateModal
-              type="Connection"
-              currentID={i}
-              key={i}
-              connections_data={connections_data}
-              setconnections_data={setconnections_data}
-              setupdate_data={setupdate_data}
-            />
-          ))}
+          {Object.keys(connections_data).map(
+            (item, i) =>
+              connections_data[item].songName != "NULL" && (
+                <UpdateModal
+                  type="Connection"
+                  currentID={i}
+                  key={i}
+                  connections_data={connections_data}
+                  setconnections_data={setconnections_data}
+                  setupdate_data={setupdate_data}
+                />
+              )
+          )}
         </div>
 
         <div className="list-column">
           <h4>Delete connection</h4>
-          {Object.keys(connections_data).map((item, i) => (
-            <DeleteModal
-              type="Connection"
-              currentID={i}
-              key={i}
-              connections_data={connections_data}
-              setconnections_data={setconnections_data}
-              setupdate_data={setupdate_data}
-            />
-          ))}
+          {Object.keys(connections_data).map(
+            (item, i) =>
+              connections_data[item].songName != "NULL" && (
+                <DeleteModal
+                  type="Connection"
+                  currentID={i}
+                  key={i}
+                  connections_data={connections_data}
+                  setconnections_data={setconnections_data}
+                  setupdate_data={setupdate_data}
+                />
+              )
+          )}
         </div>
 
         <AddModal
