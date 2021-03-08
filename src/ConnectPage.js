@@ -176,6 +176,7 @@ function UpdateForm(props) {
             custom
             onChange={(e) => selectOption(e, 1)}
           >
+            <option>{""}</option>
             {Object.keys(db_albums_data).map((item, i) => (
               <option key={i}>{db_albums_data[item].albumName}</option>
             ))}
@@ -188,6 +189,7 @@ function UpdateForm(props) {
             custom
             onChange={(e) => selectOption(e, 2)}
           >
+            <option>{""}</option>
             {Object.keys(db_artists_data).map((item, i) => (
               <option key={i}>{db_artists_data[item].singerName}</option>
             ))}
@@ -200,6 +202,7 @@ function UpdateForm(props) {
             custom
             onChange={(e) => selectOption(e, 3)}
           >
+            <option>{""}</option>
             {Object.keys(db_genres_data).map((item, i) => (
               <option key={i}>{db_genres_data[item].genreName}</option>
             ))}

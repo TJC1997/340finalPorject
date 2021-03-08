@@ -14,23 +14,44 @@ function UpdateForm(props) {
   const currentName = props.albums_data[key].albumName;
   const currentCity = props.albums_data[key].albumReleaseDate;
   const currentId = props.albums_data[key].albumID;
+  const currentsingerName = props.albums_data[key].singerName;
 
   const [nameInput, setNameInput] = useState("");
   const [cityInput, setCityInput] = useState("");
+  const [artistSelection, setartistSelection] = useState("NULL");
 
   const [newName, setNewName] = useState(currentName);
   const [newCity, setNewCity] = useState(currentCity);
+  const [artistUpdate, setartistUpdate] = useState(currentsingerName);
 
-  // useEffect(() => {
-  //   let copy = JSON.parse(JSON.stringify(props.albums_data));
-  //   if (newName != "") {
-  //     copy[key].albumName = newName;
-  //   }
-  //   if (newCity != "") {
-  //     copy[key].albumReleaseDate = newCity;
-  //   }
-  //   props.setalbums_data(copy);
-  // }, [newName, newCity]);
+  function selectOption(e, type) {
+    e.preventDefault();
+    setartistSelection(e.target.value);
+    // console.log(e.target.value);
+  }
+  const [db_artists_data, setdb_artists_data] = useState([]);
+
+  useEffect(async () => {
+    async function featchSearchResults() {
+      let jsBody = {};
+      try {
+        let link = "http://flip2.engr.oregonstate.edu:2341/singers";
+        const res = await fetch(link);
+        jsBody = await res.json();
+        console.log(link);
+      } catch (e) {
+        if (e instanceof DOMException) {
+          console.log("HTTP request abort");
+        } else {
+          console.log("error");
+          console.log(e);
+          // throw e;
+        }
+      }
+      setdb_artists_data(jsBody);
+    }
+    featchSearchResults();
+  }, []);
 
   useEffect(async () => {
     async function updateData() {
@@ -41,7 +62,9 @@ function UpdateForm(props) {
           "&" +
           newName +
           "&" +
-          newCity;
+          newCity +
+          "&" +
+          artistUpdate;
         const res = await fetch(link);
         console.log(link);
         props.setupdate_data(++track);
@@ -55,7 +78,7 @@ function UpdateForm(props) {
       }
     }
     updateData();
-  }, [newName, newCity]);
+  }, [newName, newCity, artistUpdate]);
 
   function updateNewName(e) {
     e.preventDefault();
@@ -67,6 +90,10 @@ function UpdateForm(props) {
       console.log(cityInput);
       setNewCity(cityInput);
     }
+    if (artistSelection != "NULL") {
+      setartistUpdate(artistSelection);
+      console.log(artistSelection);
+    }
     props.setmodelIsOpen(false);
   }
 
@@ -77,6 +104,7 @@ function UpdateForm(props) {
           <h4>Update {props.type} Name</h4>
           <h5>The current Album Name is {currentName}</h5>
           <h5>The current release date is {currentCity}</h5>
+          <h5>The current Aritst Name is {currentsingerName}</h5>
           <Form.Control
             placeholder="Enter New Album Name"
             onChange={(e) => {
@@ -89,6 +117,18 @@ function UpdateForm(props) {
               setCityInput(e.target.value);
             }}
           />
+          <Form.Label>Please Select New Artist Name</Form.Label>
+          <Form.Control
+            as="select"
+            size="lg"
+            custom
+            onChange={(e) => selectOption(e, 2)}
+          >
+            <option>{""}</option>
+            {Object.keys(db_artists_data).map((item, i) => (
+              <option key={i}>{db_artists_data[item].singerName}</option>
+            ))}
+          </Form.Control>
         </Form.Group>
 
         <Button
@@ -236,19 +276,41 @@ function AddForm(props) {
   const [nameInput, setNameInput] = useState("");
   const [cityInput, setCityInput] = useState("");
 
+  const [artistSelection, setartistSelection] = useState("NULL");
+
   const [newName, setNewName] = useState("");
   const [newCity, setNewCity] = useState("");
-  // useEffect(() => {
-  //   if (newName != "" && newCity != "") {
-  //     let copy = JSON.parse(JSON.stringify(props.albums_data));
 
-  //     copy[newName] = {
-  //       albumName: newName,
-  //       albumReleaseDate: newCity,
-  //     };
-  //     props.setalbums_data(copy);
-  //   }
-  // });
+  const [artistUpdate, setartistUpdate] = useState("NULL");
+
+  function selectOption(e, type) {
+    e.preventDefault();
+    setartistSelection(e.target.value);
+    console.log(e.target.value);
+  }
+  const [db_artists_data, setdb_artists_data] = useState([]);
+
+  useEffect(async () => {
+    async function featchSearchResults() {
+      let jsBody = {};
+      try {
+        let link = "http://flip2.engr.oregonstate.edu:2341/singers";
+        const res = await fetch(link);
+        jsBody = await res.json();
+        console.log(link);
+      } catch (e) {
+        if (e instanceof DOMException) {
+          console.log("HTTP request abort");
+        } else {
+          console.log("error");
+          console.log(e);
+          // throw e;
+        }
+      }
+      setdb_artists_data(jsBody);
+    }
+    featchSearchResults();
+  }, []);
 
   useEffect(async () => {
     async function insertData() {
@@ -259,7 +321,9 @@ function AddForm(props) {
             "http://flip2.engr.oregonstate.edu:2341/albums/insert/" +
             newName +
             "&" +
-            newCity;
+            newCity +
+            "&" +
+            artistUpdate;
           const res = await fetch(link);
           console.log(link);
           props.setupdate_data(++track);
@@ -274,7 +338,7 @@ function AddForm(props) {
       }
     }
     insertData();
-  }, [newName, newCity]);
+  }, [newName, newCity, artistUpdate]);
 
   function updateNewName(e) {
     e.preventDefault();
@@ -285,6 +349,9 @@ function AddForm(props) {
     if (cityInput != "") {
       console.log(cityInput);
       setNewCity(cityInput);
+    }
+    if (artistSelection != "NULL") {
+      setartistUpdate(artistSelection);
     }
     props.setmodelIsOpen(false);
   }
@@ -306,6 +373,19 @@ function AddForm(props) {
               setCityInput(e.target.value);
             }}
           />
+
+          <Form.Label>Please Select New Artist Name</Form.Label>
+          <Form.Control
+            as="select"
+            size="lg"
+            custom
+            onChange={(e) => selectOption(e, 2)}
+          >
+            <option>{""}</option>
+            {Object.keys(db_artists_data).map((item, i) => (
+              <option key={i}>{db_artists_data[item].singerName}</option>
+            ))}
+          </Form.Control>
         </Form.Group>
 
         <Button
@@ -378,6 +458,7 @@ function AlbumsPage(props) {
         }
       }
       setalbums_data(jsBody);
+      console.log(jsBody);
     }
     featchSearchResults();
   }, [update_data]);
@@ -404,6 +485,17 @@ function AlbumsPage(props) {
               albums_data[item].albumName != "NULL" && (
                 <li className="list-group-item" key={i}>
                   {albums_data[item].albumReleaseDate.slice(0, 10)}
+                </li>
+              )
+          )}
+        </div>
+        <div className="list-column">
+          <h4>Artist Name</h4>
+          {Object.keys(albums_data).map(
+            (item, i) =>
+              albums_data[item].albumName != "NULL" && (
+                <li className="list-group-item" key={i}>
+                  {albums_data[item].singerName}
                 </li>
               )
           )}
